@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Earning App</title>
+    <style>
+        /* --- পূর্বের সকল CSS স্টাইল এখানে অপরিবর্তিত থাকবে --- */
+        /* Basic Styling */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .page {
+            display: none; /* Hide all pages by default */
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .page.active {
+            display: block; /* Show active page */
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px; /* Add some top margin */
+            margin-bottom: 20px; /* Add some bottom margin */
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #007bff;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .link-button {
+            background: none;
+            border: none;
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 5px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 1em; /* Ensure consistent font size */
+            width: auto; /* Override button width */
+        }
+        .error-message { /* Specific class for errors */
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            /* margin-top: -10px; Remove negative margin */
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .success-popup { /* Specific class for signup success */
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Dashboard Specific Styles */
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-pic-container {
+            margin-right: 20px;
+        }
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ccc; /* Placeholder */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px; /* Adjusted size for initial */
+            color: #fff;
+            overflow: hidden; /* Ensure image fits */
+        }
+        .profile-pic img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+        }
+        .user-info h3 {
+            margin: 0;
+            text-align: left;
+            color: #333;
+            font-size: 1.1em; /* Slightly smaller */
+        }
+        .user-points {
+            font-size: 1.1em; /* Slightly smaller */
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 5px;
+        }
+        .withdraw-btn-dashboard {
+            background-color: #28a745;
+            width: auto;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            margin-left: 0; /* Align left */
+        }
+         .withdraw-btn-dashboard:hover {
+             background-color: #218838;
+         }
+        .app-info {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Menu Bar Styles */
+        .menu-bar {
+            position: fixed;
+            left: -250px; /* Initially hidden */
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #343a40;
+            color: white;
+            padding-top: 60px; /* Space for close button or header */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto; /* Allow scrolling if menu is long */
+        }
+        .menu-bar.open {
+            left: 0; /* Show menu */
+        }
+        .menu-bar a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid #495057;
+            transition: background-color 0.2s ease;
+        }
+        .menu-bar a:hover {
+            background-color: #495057;
+        }
+        .menu-toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1001; /* Above menu */
+        }
+        .close-menu-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999; /* Below menu, above content */
+        }
+         .overlay.active {
+             display: block;
+         }
+
+        /* Spin Page Styles */
+        .spin-container {
+            text-align: center;
+        }
+        .spin-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .spin-wheel {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: conic-gradient(red 0% 12.5%, orange 12.5% 25%, yellow 25% 37.5%, green 37.5% 50%, blue 50% 62.5%, indigo 62.5% 75%, violet 75% 87.5%, pink 87.5% 100%);
+            margin: 30px auto;
+            position: relative;
+            border: 5px solid #333;
+            transition: transform 4s cubic-bezier(0.1, 0.7, 0.0, 1.0); /* Spin animation */
+        }
+        .spin-wheel::before { /* Pointer */
+            content: '';
+            position: absolute;
+            top: -20px; /* Position above the wheel */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #333; /* Pointer color */
+        }
+        .spin-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+            min-height: 1.5em; /* Prevent layout shift */
+        }
+        .spin-button {
+             background-color: #ffc107;
+             color: #333;
+             margin-top: 20px;
+        }
+         .spin-button:hover:not(:disabled) {
+             background-color: #e0a800;
+         }
+
+        /* Quiz Page Styles */
+        .quiz-list {
+            list-style: none;
+            padding: 0;
+        }
+        .quiz-item {
+            background: #e9ecef;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .quiz-item:hover {
+             background-color: #ced4da;
+        }
+        .quiz-item h4 {
+            margin: 0 0 5px 0;
+            text-align: left;
+            color: #333;
+        }
+        .quiz-item p {
+             margin: 0;
+             font-size: 0.9em;
+             color: #555;
+        }
+        .quiz-question-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+        .quiz-options button {
+             background-color: #6c757d;
+             margin-bottom: 10px;
+        }
+         .quiz-options button:hover:not(:disabled) {
+             background-color: #5a6268;
+         }
+
+        /* Withdraw Page Styles */
+        .withdraw-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e2f3ff;
+            border: 1px solid #b8e0ff;
+            border-radius: 5px;
+        }
+        .withdraw-info p {
+             margin: 5px 0;
+             font-size: 1.1em;
+        }
+         .withdraw-info .points {
+             font-weight: bold;
+             color: #007bff;
+         }
+         .withdraw-info .dollars {
+             font-weight: bold;
+             color: #28a745;
+         }
+        .withdraw-form label {
+             display: block;
+             margin-bottom: 5px;
+             font-weight: bold;
+        }
+        .withdraw-button {
+             background-color: #28a745;
+        }
+         .withdraw-button:hover:not(:disabled) {
+             background-color: #218838;
+         }
+         .status { /* From Admin Panel for consistency */
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: capitalize;
+            color: white;
+            display: inline-block;
+            text-align: center;
+        }
+        .status.pending { background-color: #ffc107; color: #333; }
+        .status.approved { background-color: #28a745; }
+        .status.rejected { background-color: #dc3545; }
+        .status.failed { background-color: #6c757d; }
+        .status.unknown { background-color: #adb5bd; }
+         #withdrawHistoryList li {
+              font-size: 0.9em;
+              line-height: 1.4;
+         }
+
+
+        /* Profile Page Styles */
+        .profile-details {
+            text-align: center;
+        }
+        .profile-pic-large-container {
+            margin-bottom: 20px;
+        }
+        .profile-pic-large {
+             width: 120px;
+             height: 120px;
+             border-radius: 50%;
+             background-color: #ccc;
+             margin: auto;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             font-size: 48px; /* Larger initial */
+             color: #fff;
+             overflow: hidden;
+             position: relative; /* For upload button */
+        }
+        .profile-pic-large img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+        }
+        .upload-btn-wrapper {
+          position: relative;
+          overflow: hidden;
+          display: inline-block;
+          cursor: pointer;
+          margin-top: 10px;
+        }
+        .upload-btn {
+          border: 1px solid gray;
+          color: gray;
+          background-color: white;
+          padding: 8px 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 0; /* Reset margin */
+        }
+        .upload-btn-wrapper input[type=file] {
+          font-size: 100px;
+          position: absolute;
+          left: 0;
+          top: 0;
+          opacity: 0;
+          cursor: pointer;
+        }
+        .profile-info p {
+             font-size: 1.1em;
+             margin: 10px 0;
+             word-break: break-all; /* Prevent long usernames/emails overflowing */
+        }
+        .profile-info strong {
+             display: inline-block;
+             width: 100px; /* Align labels */
+             text-align: right;
+             margin-right: 10px;
+             color: #555;
+        }
+        .reset-password-btn {
+             background-color: #dc3545;
+             margin-top: 20px;
+        }
+         .reset-password-btn:hover:not(:disabled) {
+             background-color: #c82333;
+         }
+
+        /* General Utility */
+        .hidden {
+            display: none !important; /* Make hidden more forceful */
+        }
+        .text-center {
+            text-align: center;
+        }
+        .message { /* General message styling */
+            text-align: center;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+            box-sizing: border-box; /* Include padding in width/height */
+            /* Base styles common to error, success, info */
+             border: 1px solid transparent;
+        }
+        .message.success { /* Inherited by success-popup */
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        /* .message.error is handled by .error-message now */
+        .message.info { /* For loading/progress */
+            background-color: #e2f3ff;
+            color: #0c5460;
+            border-color: #b8e0ff;
+         }
+
+    </style>
+</head>
+<body>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+      // Example: import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      // Example: import { getDatabase, ref, set, get, update, serverTimestamp, increment, query, orderByChild, limitToLast, push, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+      // Example: import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDRQvcvpjH7HWkeEiK38DmelIy1YwtrjyU", // WARNING: Use secure methods
+        authDomain: "final-b3914.firebaseapp.com",
+        databaseURL: "https://final-b3914-default-rtdb.firebaseio.com",
+        projectId: "final-b3914",
+        storageBucket: "final-b3914.firebasestorage.app",
+        messagingSenderId: "832961315848",
+        appId: "1:832961315848:web:87ca34cc4c0bda29f3fdbd",
+        measurementId: "G-NE2CFGH58G"
+      };
+
+      // Initialize Firebase
+      let app, analytics, auth, db, storage;
+      try {
+        app = initializeApp(firebaseConfig);
+        // Check if Analytics is supported before initializing
+        if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+          try {
+            analytics = getAnalytics(app);
+            console.log("Firebase initialized and Analytics enabled.");
+          } catch (analyticsError) {
+            console.warn("Firebase Analytics could not be initialized (possibly blocked or unsupported environment):", analyticsError.message);
+            analytics = null;
+          }
+        } else {
+          console.log("Firebase initialized (Analytics skipped in non-browser environment).");
+        }
+
+        // Make Firebase services globally accessible via a promise
+        window.firebaseReady = new Promise(async (resolve, reject) => {
+          try {
+            const { getAuth } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+            const { getDatabase } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+            const { getStorage } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+            auth = getAuth(app);
+            db = getDatabase(app);
+            storage = getStorage(app);
+            resolve({ app, analytics, auth, db, storage });
+          } catch (serviceError) {
+            console.error("Error initializing Firebase services:", serviceError);
+            reject(serviceError);
+          }
+        });
+
+      } catch (e) {
+          console.error("Firebase initialization error:", e);
+          alert("Could not initialize Firebase. Please check your configuration and internet connection.");
+          // Set promise to reject if init fails
+          window.firebaseReady = Promise.reject(e);
+      }
+    </script>
+
+    <!-- Menu Toggle Button -->
+    <button id="menuToggleBtn" class="menu-toggle-btn hidden">☰</button>
+
+    <!-- Side Menu -->
+    <div id="menuBar" class="menu-bar">
+        <button class="close-menu-btn" onclick="toggleMenu()">&times;</button>
+        <a href="#" onclick="navigateTo('dashboardPage'); toggleMenu(); return false;">Dashboard</a>
+        <a href="#" onclick="navigateTo('spinPage'); toggleMenu(); return false;">Spin to Earn</a>
+        <a href="#" onclick="navigateTo('quizPage'); toggleMenu(); return false;">Quiz to Earn</a>
+        <a href="#" onclick="navigateTo('withdrawPage'); toggleMenu(); return false;">Withdraw</a>
+        <a href="#" onclick="navigateTo('profilePage'); toggleMenu(); return false;">Profile</a>
+        <a href="#" onclick="logout(); toggleMenu(); return false;">Logout</a>
+    </div>
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+
+    <!-- ==== USER PAGES ==== -->
+
+    <!-- Sign Up Page -->
+    <div id="signupPage" class="page active">
+        <div class="container">
+            <h1>Sign Up</h1>
+            <div id="signupSuccess" class="success-popup hidden"></div>
+            <div id="signupError" class="error-message hidden"></div>
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <input type="email" id="signupEmail" placeholder="Email" required>
+                <input type="text" id="signupFullName" placeholder="Full Name" required>
+                <input type="text" id="signupUsername" placeholder="Username" required>
+                <input type="password" id="signupPassword" placeholder="Password (min 6 chars)" required>
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="text-center">
+                <p>Already have an account? <button type="button" class="link-button" onclick="navigateTo('loginPage')">Login</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <div class="container">
+            <h1>Login</h1>
+            <div id="loginError" class="error-message hidden"></div> {/* Changed to div */}
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" id="loginIdentifier" placeholder="Email or Username" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+             <div class="text-center">
+                <p>Don't have an account? <button type="button" class="link-button" onclick="navigateTo('signupPage')">Sign Up</button></p> {/* Ensure type="button" */}
+                <p><button type="button" class="link-button" onclick="navigateTo('forgotPasswordPage')">Forgot Password?</button></p> {/* Ensure type="button" */}
+            </div>
+        </div>
+    </div>
+
+     <!-- Forgot Password Page -->
+    <div id="forgotPasswordPage" class="page">
+        <div class="container">
+            <h1>Reset Password</h1>
+            <div id="resetError" class="error-message hidden"></div> {/* Changed to div */}
+            <div id="resetSuccess" class="message success hidden"></div> {/* Changed to div */}
+            <form id="resetForm" onsubmit="handlePasswordResetRequestFromInput(event)">
+                <p>Enter the email address associated with your account.</p>
+                <input type="email" id="resetEmail" placeholder="Your Email Address" required>
+                <button type="submit">Send Reset Link</button>
+            </form>
+            <div class="text-center">
+                <p><button type="button" class="link-button" onclick="navigateTo('loginPage')">Back to Login</button></p> {/* Ensure type="button" */}
+            </div>
+        </div>
+    </div>
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page">
+         <div class="dashboard-header">
+             <div class="profile-pic-container">
+                <div class="profile-pic" id="dashboardProfilePic">
+                    <img id="dashboardProfilePicImg" src="" alt="P" style="display:none;">
+                    <span id="dashboardProfilePicInitial">?</span>
+                </div>
+             </div>
+             <div class="user-info">
+                 <h3 id="dashboardUsername">Username</h3>
+                 <div class="user-points">Points: <span id="dashboardTotalPoints">0</span></div>
+                 <button type="button" class="withdraw-btn-dashboard" onclick="navigateTo('withdrawPage')">Withdraw</button>
+             </div>
+         </div>
+        <div class="text-center">
+            <h2>Welcome Back!</h2>
+            <p>Use the menu (☰) to navigate.</p>
+        </div>
+        <div class="app-info">
+            <p>&copy; 2024 Your Earning App. All rights reserved.</p>
+            <p>Earn points by completing tasks and withdraw your earnings.</p>
+        </div>
+    </div>
+
+    <!-- Spin to Earn Page -->
+    <div id="spinPage" class="page">
+        <div class="container spin-container">
+            <h2>Spin to Earn</h2>
+            <div class="spin-stats">
+                <span>Spins Left Today: <strong id="spinRemaining">5</strong> / 5</span>
+            </div>
+            <div id="spinWheel" class="spin-wheel"></div>
+            <div id="spinResult" class="spin-result">Spin the wheel!</div>
+            <button type="button" id="spinButton" class="spin-button" onclick="handleSpin()">SPIN</button>
+            <div id="spinMessage" class="message error hidden"></div>
+            <div id="nextSpinTimer" class="message info hidden"></div>
+        </div>
+    </div>
+
+    <!-- Quiz to Earn Page -->
+    <div id="quizPage" class="page">
+        <div class="container">
+            <h2>Quiz to Earn</h2>
+            <p>Complete quizzes to earn points. New quizzes added regularly!</p>
+            <div id="quizListContainer">
+                 <p><i>Loading quizzes...</i></p>
+            </div>
+             <div id="quizPlayContainer" class="hidden">
+                 <h3 id="quizPlayTitle">Quiz Title</h3>
+                 <div id="quizQuestionText" class="quiz-question-container">Question text will appear here.</div>
+                 <h4>Select your answer:</h4>
+                 <div id="quizOptions" class="quiz-options"></div>
+                 <div id="quizFeedback" class="message hidden"></div>
+             </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Page -->
+    <div id="withdrawPage" class="page">
+        <div class="container">
+            <h2>Withdraw Earnings</h2>
+            <div class="withdraw-info">
+                <p>Your Total Points: <strong id="withdrawTotalPoints" class="points">0</strong></p>
+                <p>Equivalent Value: <strong id="withdrawDollarValue" class="dollars">$0.00</strong></p>
+                <p>(1000 Points = $0.10 USD)</p>
+            </div>
+             <div id="withdrawMessage" class="message hidden"></div>
+             <div id="withdrawHistory" style="margin-top: 20px;">
+                <h3>Withdrawal History (Last 10)</h3>
+                <ul id="withdrawHistoryList" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 4px;">
+                    <li><i>Login to see history.</i></li>
+                </ul>
+             </div>
+            <form id="withdrawForm" onsubmit="handleWithdrawRequest(event)" class="withdraw-form">
+                <label for="binanceUID">Binance UID:</label>
+                <input type="text" id="binanceUID" placeholder="Enter your Binance UID" required>
+                <p><i>Minimum withdrawal: 1000 points.</i></p>
+                <button id="withdrawSubmitButton" type="submit" class="withdraw-button" disabled>Request Withdraw</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profilePage" class="page">
+        <div class="container profile-details">
+            <h2>My Profile</h2>
+            <div class="profile-pic-large-container">
+                 <div class="profile-pic-large" id="profilePagePic">
+                    <img id="profilePagePicImg" src="" alt="P" style="display:none;">
+                    <span id="profilePagePicInitial">?</span>
+                 </div>
+                 <div class="upload-btn-wrapper">
+                     <button type="button" class="upload-btn">Upload Photo</button> {/* Changed to type button */}
+                     <input type="file" id="profilePicUpload" accept="image/*" onchange="handleProfilePicUpload(event)" />
+                 </div>
+                 <p id="uploadStatus" class="message hidden"></p>
+            </div>
+            <div class="profile-info">
+                <p><strong>Full Name:</strong> <span id="profileFullName">N/A</span></p>
+                <p><strong>Username:</strong> <span id="profileUsername">N/A</span></p>
+                <p><strong>Email:</strong> <span id="profileEmail">N/A</span></p>
+            </div>
+            <button type="button" class="reset-password-btn" onclick="handlePasswordResetRequestFromProfile()">Reset Password</button> {/* Changed to type button */}
+            <div id="profileMessage" class="message hidden"></div>
+        </div>
+    </div>
+
+
+    <!-- ==== JAVASCRIPT for User App ==== -->
+    <script>
+        // --- Global State ---
+        let currentUserData = null;
+        let currentUserId = null;
+        const dailySpinLimit = 5;
+        const spinCooldownSeconds = 10;
+        let nextSpinAvailableTime = 0;
+        let spinTimerInterval = null;
+        const POINT_TO_DOLLAR_RATE = 0.0001;
+        const MIN_WITHDRAW_POINTS = 1000;
+        let isSpinning = false;
+        let availableQuizzes = [];
+        let currentQuizData = null;
+
+        // Firebase service references (will be assigned when ready)
+        let fbAuth, fbDb, fbStorage;
+
+
+        // --- DOM Elements ---
+        const pages = document.querySelectorAll('.page');
+        const menuBar = document.getElementById('menuBar');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const overlay = document.getElementById('overlay');
+        const spinWheel = document.getElementById('spinWheel');
+        const spinButton = document.getElementById('spinButton');
+        const spinResult = document.getElementById('spinResult');
+        const spinRemainingDisplay = document.getElementById('spinRemaining');
+        const spinMessage = document.getElementById('spinMessage');
+        const nextSpinTimerDisplay = document.getElementById('nextSpinTimer');
+        const withdrawTotalPointsDisplay = document.getElementById('withdrawTotalPoints');
+        const withdrawDollarValueDisplay = document.getElementById('withdrawDollarValue');
+        const withdrawSubmitButton = document.getElementById('withdrawSubmitButton');
+        const withdrawMessage = document.getElementById('withdrawMessage');
+        const withdrawHistoryList = document.getElementById('withdrawHistoryList');
+        const profileMessage = document.getElementById('profileMessage');
+        const quizListContainer = document.getElementById('quizListContainer');
+        const quizPlayContainer = document.getElementById('quizPlayContainer');
+        const signupSuccessPopup = document.getElementById('signupSuccess');
+        const signupErrorEl = document.getElementById('signupError'); // Defined for clarity
+        const loginErrorEl = document.getElementById('loginError'); // Defined for clarity
+        const resetErrorEl = document.getElementById('resetError'); // Defined for clarity
+        const resetSuccessEl = document.getElementById('resetSuccess'); // Defined for clarity
+
+
+        // --- Navigation ---
+        function navigateTo(pageId) {
+            console.log("Navigating to:", pageId); // Debugging log
+            // Close menu if open
+            if (menuBar.classList.contains('open')) {
+                 toggleMenu();
+            }
+            // Hide all pages first
+            pages.forEach(page => page.classList.add('hidden'));
+            // Show the target page
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('active'); // Keep active class for potential styling/JS checks
+            } else {
+                console.error(`Navigation error: Page with ID "${pageId}" not found.`);
+                // Optionally navigate to a default page like login or dashboard
+                navigateTo('loginPage'); // Fallback to login page
+                return;
+            }
+
+            // Menu button visibility based on page and login status
+            const authPages = ['loginPage', 'signupPage', 'forgotPasswordPage'];
+            if (authPages.includes(pageId)) {
+                menuToggleBtn.classList.add('hidden');
+                 // Hide success popup if navigating away from signup
+                 if(pageId !== 'signupPage') hideMessage(signupSuccessPopup);
+            } else {
+                // Show menu button ONLY if logged in
+                menuToggleBtn.classList.toggle('hidden', !currentUserId);
+            }
+            window.scrollTo(0, 0); // Scroll to top
+
+            // Load data relevant to the page if logged in
+             if (currentUserId) {
+                 if (pageId === 'quizPage') loadQuizzes();
+                 if (pageId === 'withdrawPage') loadWithdrawalHistory();
+                 if (pageId === 'spinPage') updateSpinUI();
+                 if (pageId === 'dashboardPage') updateDashboardPoints();
+             }
+        }
+
+        function toggleMenu() {
+            menuBar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        // --- Authentication ---
+        async function handleSignup(event) {
+            event.preventDefault();
+            const email = document.getElementById('signupEmail').value.trim();
+            const fullName = document.getElementById('signupFullName').value.trim();
+            const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
+            hideMessage(signupErrorEl);
+            hideMessage(signupSuccessPopup);
+
+            // Basic Validations
+            if (!email || !fullName || !username || !password) {
+                showErrorMessage(signupErrorEl, "Please fill in all fields."); return;
+            }
+            if (password.length < 6) {
+                showErrorMessage(signupErrorEl, "Password must be at least 6 characters."); return;
+            }
+            if (!/^[a-z0-9_]+$/.test(username)) {
+                showErrorMessage(signupErrorEl, "Username can only contain lowercase letters, numbers, and underscores."); return;
+            }
+
+            const submitButton = event.submitter;
+            showLoadingButton(submitButton, true, 'Signing Up...');
+
+            try {
+                await window.firebaseReady; // Ensure Firebase services are ready
+
+                // Check username availability
+                const usernameExists = await checkUsernameExists(username);
+                if (usernameExists) {
+                    showErrorMessage(signupErrorEl, "Username is already taken. Please choose another.");
+                    showLoadingButton(submitButton, false); return;
+                }
+
+                // Import Firebase functions dynamically
+                const { createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                const { ref, set, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+
+
+                // Create Auth user
+                const userCredential = await createUserWithEmailAndPassword(fbAuth, email, password);
+                const user = userCredential.user;
+                console.log("User created successfully in Auth:", user.uid);
+                const newUserId = user.uid; // Store UID temporarily
+
+                // Prepare user data for Database
+                const userData = {
+                     email: email, fullName: fullName, username: username, points: 0,
+                     profilePicUrl: null, createdAt: serverTimestamp(),
+                     lastSpinTimestamp: 0, spinsToday: 0
+                };
+
+                // Save to Realtime Database (Users and Usernames mapping)
+                const dbUpdates = {};
+                dbUpdates[`users/${newUserId}`] = userData;
+                dbUpdates[`usernames/${username}`] = newUserId;
+                await update(ref(fbDb), dbUpdates); // Use update for multi-location write
+                console.log("User data saved to database.");
+
+                // *** Sign the newly created user OUT immediately ***
+                await signOut(fbAuth);
+                console.log("Newly signed up user signed out.");
+
+                // Show success message and prepare for redirect
+                showSuccessPopupMessage(signupSuccessPopup, "Signup Successful! Please login.");
+                document.getElementById('signupForm').reset();
+                showLoadingButton(submitButton, false);
+
+                // Redirect to login page after delay
+                setTimeout(() => {
+                    hideMessage(signupSuccessPopup);
+                    navigateTo('loginPage');
+                }, 2500); // Adjust delay as needed
+
+            } catch (error) {
+                console.error("Signup Error:", error);
+                // If signout fails after creation (unlikely but possible), still show error
+                showErrorMessage(signupErrorEl, getFirebaseErrorMessage(error));
+                showLoadingButton(submitButton, false);
+            }
+        }
+
+        async function checkUsernameExists(username) {
+            try {
+                await window.firebaseReady;
+                const { ref, get } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const snapshot = await get(ref(fbDb, 'usernames/' + username));
+                return snapshot.exists();
+            } catch (error) {
+                console.error("Error checking username:", error);
+                return true; // Fail safe: assume exists on error
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            hideMessage(loginErrorEl);
+            const submitButton = event.submitter;
+            showLoadingButton(submitButton, true, 'Logging In...');
+
+            if (!identifier || !password) {
+                 showErrorMessage(loginErrorEl, "Please enter Email/Username and Password.");
+                 showLoadingButton(submitButton, false); return;
+            }
+
+            try {
+                await window.firebaseReady;
+                const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                const { ref, get } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+                let emailToLogin = identifier;
+                // Username check logic (same as before)
+                if (!identifier.includes('@')) {
+                    const username = identifier.toLowerCase();
+                    const userUidSnapshot = await get(ref(fbDb, 'usernames/' + username));
+                    if (!userUidSnapshot.exists()) {
+                        const error = new Error("Firebase: Error (auth/user-not-found).");
+                        error.code = "auth/user-not-found"; throw error;
+                    }
+                    const uid = userUidSnapshot.val();
+                    const emailSnapshot = await get(ref(fbDb, `users/${uid}/email`));
+                    if (!emailSnapshot.exists()) {
+                        throw new Error("Authentication failed (data inconsistency).");
+                    }
+                    emailToLogin = emailSnapshot.val();
+                }
+
+                // Sign in
+                const userCredential = await signInWithEmailAndPassword(fbAuth, emailToLogin, password);
+                console.log("Login successful for UID:", userCredential.user.uid);
+                // Auth listener (onAuthStateChanged) will handle fetching data and navigating to dashboard.
+                document.getElementById('loginForm').reset();
+                // Button state might be reset by auth listener UI update
+                // showLoadingButton(submitButton, false);
+
+            } catch (error) {
+                 console.error("Login Error:", error);
+                 showErrorMessage(loginErrorEl, getFirebaseErrorMessage(error));
+                 showLoadingButton(submitButton, false);
+            }
+        }
+
+        async function logout() {
+            try {
+                await window.firebaseReady;
+                const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                await signOut(fbAuth);
+                console.log("User initiated sign out.");
+                // Auth listener will handle UI reset and navigation
+            } catch (error) {
+                console.error("Sign out error:", error);
+                alert("Error signing out. Please try again.");
+            }
+        }
+
+        // --- Fetch User Data ---
+        async function fetchUserData(uid) {
+             if (!uid) return false;
+             try {
+                 await window.firebaseReady;
+                 const { ref, get } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                 const userRef = ref(fbDb, 'users/' + uid);
+                 const snapshot = await get(userRef);
+                 if (snapshot.exists()) {
+                     currentUserData = { uid: uid, ...snapshot.val() };
+                     console.log("User data fetched/updated:", currentUserData);
+                     await checkAndResetDailySpins(); // Check spins on data load
+                     return true;
+                 } else {
+                     console.error("CRITICAL: User data not found in DB for authenticated UID:", uid);
+                     // Force logout if data is missing for an authenticated user
+                     logout(); // Call logout function which triggers auth listener
+                     return false;
+                 }
+             } catch (error) {
+                 console.error("Error fetching user data:", error);
+                  logout(); // Also logout on fetch error
+                 return false;
+             }
+        }
+
+        // --- checkAndResetDailySpins (অপরিবর্তিত) ---
+        async function checkAndResetDailySpins() {
+             if (!currentUserData || !currentUserId) return;
+             try {
+                await window.firebaseReady;
+                const now = new Date();
+                const lastSpinDate = currentUserData.lastSpinTimestamp ? new Date(currentUserData.lastSpinTimestamp) : new Date(0);
+                const todayStr = now.toISOString().slice(0, 10);
+                const lastSpinStr = lastSpinDate.toISOString().slice(0, 10);
+
+                if (todayStr !== lastSpinStr && currentUserData.spinsToday > 0) {
+                    console.log("New day detected, resetting spins.");
+                    currentUserData.spinsToday = 0;
+                    const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                    await update(ref(fbDb, 'users/' + currentUserId), { spinsToday: 0 });
+                }
+             } catch (error) {
+                console.error("Failed to check/reset daily spins in DB:", error);
+             }
+         }
+
+        // --- updateUIForLoggedInUser (অপরিবর্তিত) ---
+        function updateUIForLoggedInUser() {
+            if (!currentUserData) return;
+            console.log("Updating UI for logged in user:", currentUserData.username); // Debug
+
+            // Dashboard
+            document.getElementById('dashboardUsername').textContent = currentUserData.username || 'N/A';
+            document.getElementById('dashboardTotalPoints').textContent = currentUserData.points || 0;
+            updateProfilePic('dashboardProfilePic', currentUserData.profilePicUrl, currentUserData.fullName);
+
+            // Profile Page
+            document.getElementById('profileFullName').textContent = currentUserData.fullName || 'N/A';
+            document.getElementById('profileUsername').textContent = currentUserData.username || 'N/A';
+            document.getElementById('profileEmail').textContent = currentUserData.email || 'N/A';
+            updateProfilePic('profilePagePic', currentUserData.profilePicUrl, currentUserData.fullName);
+
+            // Withdraw Page
+            updateWithdrawUI();
+
+            // Spin Page
+            updateSpinUI();
+
+            // Quiz Page - data loading deferred to navigation
+        }
+
+        // --- clearUserDataFromUI (অপরিবর্তিত) ---
+        function clearUserDataFromUI() {
+             console.log("Clearing user data from UI."); // Debug
+             // Clear dashboard
+            document.getElementById('dashboardUsername').textContent = 'Username';
+            document.getElementById('dashboardTotalPoints').textContent = '0';
+             updateProfilePic('dashboardProfilePic', null, '?');
+            // Clear profile
+            document.getElementById('profileFullName').textContent = 'N/A';
+            document.getElementById('profileUsername').textContent = 'N/A';
+            document.getElementById('profileEmail').textContent = 'N/A';
+             updateProfilePic('profilePagePic', null, '?');
+             // Clear withdraw
+             document.getElementById('withdrawTotalPoints').textContent = '0';
+             document.getElementById('withdrawDollarValue').textContent = '$0.00';
+             withdrawHistoryList.innerHTML = '<li><i>Login to see history.</i></li>';
+             // Clear spin
+             spinRemainingDisplay.textContent = dailySpinLimit;
+             spinResult.textContent = 'Login to Spin';
+             spinButton.disabled = true;
+             nextSpinTimerDisplay.classList.add('hidden');
+             stopSpinTimer();
+             // Clear messages
+             hideMessage(spinMessage);
+             hideMessage(withdrawMessage);
+             hideMessage(profileMessage);
+             hideMessage(document.getElementById('uploadStatus'));
+             hideMessage(signupErrorEl);
+             hideMessage(loginErrorEl);
+             hideMessage(resetErrorEl);
+             hideMessage(resetSuccessEl);
+             hideMessage(signupSuccessPopup);
+        }
+
+
+        // --- updateProfilePic (অপরিবর্তিত) ---
+        function updateProfilePic(elementId, url, name) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            const img = container.querySelector('img');
+            const initial = container.querySelector('span');
+            if (!img || !initial) return;
+            if (url) {
+                img.src = url;
+                img.alt = name ? name.substring(0, 1).toUpperCase() : 'P';
+                img.style.display = 'block';
+                initial.style.display = 'none';
+            } else {
+                img.style.display = 'none'; img.src = '';
+                initial.textContent = name ? name.substring(0, 1).toUpperCase() : '?';
+                initial.style.display = 'flex';
+            }
+        }
+
+        // --- Spin Logic (updateSpinUI, startSpinTimer, stopSpinTimer, handleSpin) (অপরিবর্তিত) ---
+         function updateSpinUI() {
+             if (!currentUserData) {
+                  spinButton.disabled = true;
+                  spinRemainingDisplay.textContent = '-';
+                  spinResult.textContent = 'Login to spin';
+                   nextSpinTimerDisplay.classList.add('hidden');
+                   stopSpinTimer();
+                  return;
+             };
+             const spinsLeft = dailySpinLimit - (currentUserData.spinsToday || 0);
+             spinRemainingDisplay.textContent = spinsLeft;
+             const now = Date.now();
+             if (spinsLeft <= 0) {
+                 spinButton.disabled = true;
+                 spinResult.textContent = "No spins left for today.";
+                 nextSpinTimerDisplay.classList.add('hidden');
+                 stopSpinTimer();
+             } else if (isSpinning) {
+                 spinButton.disabled = true;
+                 spinResult.textContent = "Spinning...";
+                 nextSpinTimerDisplay.classList.add('hidden');
+                 stopSpinTimer();
+             } else if (now < nextSpinAvailableTime) {
+                 spinButton.disabled = true;
+                 startSpinTimer();
+             } else {
+                 spinButton.disabled = false;
+                 spinResult.textContent = "Spin the wheel!";
+                 nextSpinTimerDisplay.classList.add('hidden');
+                 stopSpinTimer();
+             }
+        }
+        function startSpinTimer() {
+             stopSpinTimer();
+             nextSpinTimerDisplay.classList.remove('hidden');
+             const updateTimer = () => {
+                 const now = Date.now();
+                 const secondsLeft = Math.ceil((nextSpinAvailableTime - now) / 1000);
+                 if (secondsLeft > 0) {
+                      nextSpinTimerDisplay.textContent = `Next spin available in ${secondsLeft}s`;
+                      spinButton.disabled = true;
+                 } else {
+                      nextSpinTimerDisplay.classList.add('hidden');
+                      stopSpinTimer();
+                      updateSpinUI();
+                 }
+             };
+             updateTimer();
+             spinTimerInterval = setInterval(updateTimer, 1000);
+        }
+        function stopSpinTimer() {
+             if (spinTimerInterval) { clearInterval(spinTimerInterval); spinTimerInterval = null; }
+        }
+        async function handleSpin() {
+            hideMessage(spinMessage); // Clear previous messages first
+            if (!currentUserData || !currentUserId) {
+                showErrorMessage(spinMessage, "Please login first."); return;
+            }
+            if (isSpinning) return; // Already spinning
+            const spinsLeft = dailySpinLimit - (currentUserData.spinsToday || 0);
+            if (spinsLeft <= 0) {
+                showErrorMessage(spinMessage, "You have no spins left for today."); return;
+            }
+            const now = Date.now();
+            if (now < nextSpinAvailableTime) {
+                showErrorMessage(spinMessage, `Please wait ${Math.ceil((nextSpinAvailableTime - now) / 1000)}s for the cooldown.`); return;
+            }
+            isSpinning = true;
+            updateSpinUI();
+            const randomDegrees = Math.floor(Math.random() * 3600) + 720;
+            const randomPoints = Math.floor(Math.random() * (75 - 5 + 1)) + 5;
+            spinWheel.style.transform = `rotate(${randomDegrees}deg)`;
+            await new Promise(resolve => setTimeout(resolve, 4100));
+             try {
+                await window.firebaseReady;
+                 const { ref, update, increment, serverTimestamp, push } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                 const updates = {};
+                 updates[`users/${currentUserId}/points`] = increment(randomPoints);
+                 updates[`users/${currentUserId}/spinsToday`] = increment(1);
+                 updates[`users/${currentUserId}/lastSpinTimestamp`] = serverTimestamp();
+                 const spinHistoryRef = ref(fbDb, `spinHistory/${currentUserId}`);
+                 updates[`spinHistory/${currentUserId}/${push(spinHistoryRef).key}`] = { // Use push().key for path
+                     points: randomPoints, timestamp: serverTimestamp()
+                 };
+                 await update(ref(fbDb), updates);
+                 currentUserData.points += randomPoints;
+                 currentUserData.spinsToday += 1;
+                 currentUserData.lastSpinTimestamp = Date.now();
+                 nextSpinAvailableTime = Date.now() + (spinCooldownSeconds * 1000);
+                 spinResult.textContent = `You won ${randomPoints} points!`;
+                 updateDashboardPoints(); // Updates dashboard and withdraw UI indirectly
+             } catch (error) {
+                 console.error("Failed to update spin data in Firebase:", error);
+                 showErrorMessage(spinMessage, "Error saving spin results. Please try again.");
+             } finally {
+                isSpinning = false;
+                updateSpinUI(); // Update UI regardless of success/failure
+                 setTimeout(() => { // Reset wheel visually
+                     spinWheel.style.transition = 'none';
+                     spinWheel.style.transform = 'rotate(0deg)';
+                     spinWheel.offsetHeight;
+                     spinWheel.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.0, 1.0)';
+                 }, 500);
+             }
+        }
+
+        // --- updateDashboardPoints (অপরিবর্তিত) ---
+         function updateDashboardPoints() {
+             if (currentUserData) {
+                const dashboardPointsEl = document.getElementById('dashboardTotalPoints');
+                if (dashboardPointsEl) dashboardPointsEl.textContent = currentUserData.points || 0;
+                updateWithdrawUI(); // Also update withdraw page info
+             }
+         }
+
+        // --- Quiz Logic (loadQuizzes, displayQuizItem, startQuiz, checkAnswer) (অপরিবর্তিত) ---
+        async function loadQuizzes() {
+             if (!currentUserId) return;
+             quizListContainer.innerHTML = '<p><i>Loading quizzes...</i></p>';
+             quizPlayContainer.classList.add('hidden');
+             availableQuizzes = [];
+             try {
+                await window.firebaseReady;
+                 const { ref, get } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                 const quizzesRef = ref(fbDb, 'quizzes');
+                 const snapshot = await get(quizzesRef);
+                 quizListContainer.innerHTML = '';
+                 if (snapshot.exists()) {
+                     snapshot.forEach(childSnapshot => {
+                         const quiz = { id: childSnapshot.key, ...childSnapshot.val() };
+                          if (quiz.question && Array.isArray(quiz.options) && quiz.options.length >= 2 && typeof quiz.correctAnswerIndex === 'number' && quiz.points > 0) {
+                             availableQuizzes.push(quiz);
+                             displayQuizItem(quiz);
+                          } else { console.warn("Skipping invalid quiz:", quiz.id); }
+                     });
+                 }
+                 if (availableQuizzes.length === 0) {
+                     quizListContainer.innerHTML = '<p><i>No valid quizzes available right now.</i></p>';
+                 }
+             } catch (error) {
+                 console.error("Error loading quizzes:", error);
+                 quizListContainer.innerHTML = '<p><i>Could not load quizzes. Please try again later.</i></p>';
+             }
+         }
+        function displayQuizItem(quiz) {
+             const quizItemDiv = document.createElement('div');
+             quizItemDiv.className = 'quiz-item';
+             quizItemDiv.innerHTML = `<h4>${escapeHtml(quiz.question.substring(0, 50))}${quiz.question.length > 50 ? '...' : ''}</h4><p>Earn <strong>${quiz.points} Points</strong></p>`;
+             quizItemDiv.dataset.quizId = quiz.id;
+             quizItemDiv.onclick = () => startQuiz(quiz.id);
+             quizListContainer.appendChild(quizItemDiv);
+         }
+        function startQuiz(quizId) {
+             currentQuizData = availableQuizzes.find(q => q.id === quizId);
+             if (!currentQuizData) { alert("Error starting quiz."); return; }
+             const quizPlayTitle = document.getElementById('quizPlayTitle');
+             const questionText = document.getElementById('quizQuestionText');
+             const optionsContainer = document.getElementById('quizOptions');
+             const feedback = document.getElementById('quizFeedback');
+             quizListContainer.classList.add('hidden');
+             quizPlayContainer.classList.remove('hidden');
+             hideMessage(feedback);
+             quizPlayTitle.textContent = `Quiz: Earn ${currentQuizData.points} Points`;
+             questionText.textContent = currentQuizData.question;
+             optionsContainer.innerHTML = '';
+             const shuffledOptions = currentQuizData.options
+                .map((option, originalIndex) => ({ text: option, index: originalIndex }))
+                .sort(() => Math.random() - 0.5);
+             shuffledOptions.forEach((optionData) => {
+                  const optionButton = document.createElement('button');
+                  optionButton.type = 'button'; // Ensure type is button
+                  optionButton.textContent = optionData.text;
+                  optionButton.onclick = () => checkAnswer(optionData.index);
+                  optionsContainer.appendChild(optionButton);
+             });
+         }
+        async function checkAnswer(selectedIndex) {
+             if (!currentQuizData || !currentUserId) return;
+             const feedback = document.getElementById('quizFeedback');
+             const optionsContainer = document.getElementById('quizOptions');
+             optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+             optionsContainer.insertAdjacentHTML('beforeend', '<p><i>Checking answer...</i></p>');
+             const isCorrect = (selectedIndex === currentQuizData.correctAnswerIndex);
+             const pointsToAward = currentQuizData.points || 0;
+             await new Promise(resolve => setTimeout(resolve, 500));
+             try {
+                await window.firebaseReady;
+                 const { ref, update, increment, serverTimestamp, push, set } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                 const updates = {};
+                 const historyUpdates = {}; // Separate for history path
+                 const historyRef = ref(fbDb, `quizHistory/${currentUserId}`);
+                 const newHistoryKey = push(historyRef).key; // Get key first
+
+                 if (isCorrect) {
+                     updates[`users/${currentUserId}/points`] = increment(pointsToAward);
+                     historyUpdates[`quizHistory/${currentUserId}/${newHistoryKey}`] = {
+                         quizId: currentQuizData.id, points: pointsToAward, timestamp: serverTimestamp(), correct: true
+                     };
+                     await update(ref(fbDb), { ...updates, ...historyUpdates }); // Combine updates
+                     currentUserData.points += pointsToAward;
+                     updateDashboardPoints();
+                     showSuccessMessage(feedback, `Correct! You earned ${pointsToAward} points.`);
+                 } else {
+                      const correctAnswerText = currentQuizData.options[currentQuizData.correctAnswerIndex];
+                     showErrorMessage(feedback, `Incorrect. The correct answer was: ${escapeHtml(correctAnswerText)}.`);
+                      historyUpdates[`quizHistory/${currentUserId}/${newHistoryKey}`] = {
+                          quizId: currentQuizData.id, points: 0, timestamp: serverTimestamp(), correct: false
+                      };
+                      await update(ref(fbDb), historyUpdates); // Only update history for incorrect
+                 }
+             } catch (error) {
+                 console.error("Failed to update points/history after quiz:", error);
+                 showErrorMessage(feedback, `There was an error saving quiz results. Please try again later.`);
+             } finally {
+                const checkingMsg = optionsContainer.querySelector('p');
+                if(checkingMsg) checkingMsg.remove();
+                feedback.classList.remove('hidden');
+                feedback.innerHTML += `<br><button style="margin-top:10px;" type="button" class="link-button" onclick="navigateTo('quizPage')">Back to Quizzes</button>`;
+             }
+         }
+
+        // --- Withdraw Logic (updateWithdrawUI, loadWithdrawalHistory, handleWithdrawRequest) (অপরিবর্তিত) ---
+        function updateWithdrawUI() {
+            if (!currentUserData) {
+                withdrawTotalPointsDisplay.textContent = '0';
+                withdrawDollarValueDisplay.textContent = '$0.00';
+                withdrawSubmitButton.disabled = true; return;
+            }
+            const totalPoints = currentUserData.points || 0;
+            const dollarValue = (totalPoints * POINT_TO_DOLLAR_RATE).toFixed(2);
+            withdrawTotalPointsDisplay.textContent = totalPoints;
+            withdrawDollarValueDisplay.textContent = `$${dollarValue}`;
+            withdrawSubmitButton.disabled = totalPoints < MIN_WITHDRAW_POINTS;
+        }
+        async function loadWithdrawalHistory() {
+            if (!currentUserId) return;
+            withdrawHistoryList.innerHTML = '<li><i>Loading history...</i></li>';
+            try {
+                await window.firebaseReady;
+                const { ref, query, orderByChild, limitToLast, get } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const historyRef = ref(fbDb, `withdrawRequests/${currentUserId}`);
+                const historyQuery = query(historyRef, orderByChild('requestedAt'), limitToLast(10));
+                const snapshot = await get(historyQuery);
+                withdrawHistoryList.innerHTML = '';
+                if (snapshot.exists()) {
+                    let requests = [];
+                    snapshot.forEach(childSnapshot => requests.push({ id: childSnapshot.key, ...childSnapshot.val() }));
+                    requests.reverse().forEach((req, index) => {
+                          const li = document.createElement('li');
+                          const reqDate = req.requestedAt ? new Date(req.requestedAt).toLocaleString() : 'N/A';
+                          const status = req.status || 'unknown';
+                          li.innerHTML = `${reqDate}: ${req.points} points request (${escapeHtml(req.binanceUID || 'N/A')}). Status: <span class="status ${status}">${status}</span>`;
+                          li.style.marginBottom = '10px'; li.style.paddingBottom = '10px'; li.style.borderBottom = '1px solid #eee';
+                          if(index === requests.length - 1) { li.style.borderBottom = 'none'; li.style.marginBottom = '0'; li.style.paddingBottom = '0'; }
+                          withdrawHistoryList.appendChild(li);
+                     });
+                } else { withdrawHistoryList.innerHTML = '<li><i>No withdrawal history found.</i></li>'; }
+            } catch (error) {
+                console.error("Error loading withdrawal history:", error);
+                withdrawHistoryList.innerHTML = '<li><i>Could not load history.</i></li>';
+            }
+        }
+        async function handleWithdrawRequest(event) {
+            event.preventDefault();
+            const binanceUID = document.getElementById('binanceUID').value.trim();
+            hideMessage(withdrawMessage);
+            const submitButton = event.submitter;
+            showLoadingButton(submitButton, true, 'Requesting...');
+            if (!binanceUID) {
+                 showErrorMessage(withdrawMessage, "Please enter your Binance UID."); showLoadingButton(submitButton, false); return;
+            }
+            if (!currentUserData || !currentUserId || currentUserData.points < MIN_WITHDRAW_POINTS) {
+                 showErrorMessage(withdrawMessage, `You need at least ${MIN_WITHDRAW_POINTS} points to withdraw.`); showLoadingButton(submitButton, false); return;
+            }
+            const pointsToWithdraw = currentUserData.points;
+            try {
+                await window.firebaseReady;
+                const { ref, query, orderByChild, equalTo, get, push, serverTimestamp, update, increment } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                const pendingQuery = query(ref(fbDb, `withdrawRequests/${currentUserId}`), orderByChild('status'), equalTo('pending'));
+                const pendingSnapshot = await get(pendingQuery);
+                if (pendingSnapshot.exists()) {
+                     showErrorMessage(withdrawMessage, "You already have a pending withdrawal request."); showLoadingButton(submitButton, false); return;
+                }
+                 const requestData = {
+                     userId: currentUserId, username: currentUserData.username, points: pointsToWithdraw,
+                     binanceUID: binanceUID, requestedAt: serverTimestamp(), status: 'pending'
+                 };
+                 const updates = {};
+                 const requestsRef = ref(fbDb, `withdrawRequests/${currentUserId}`);
+                 const newRequestRef = push(requestsRef);
+                 updates[`withdrawRequests/${currentUserId}/${newRequestRef.key}`] = requestData;
+                 updates[`users/${currentUserId}/points`] = increment(-pointsToWithdraw);
+                 await update(ref(fbDb), updates);
+                 currentUserData.points -= pointsToWithdraw;
+                 showSuccessMessage(withdrawMessage, `Withdraw request for ${pointsToWithdraw} points submitted! New balance: ${currentUserData.points}.`);
+                 document.getElementById('withdrawForm').reset();
+                 updateWithdrawUI();
+                 loadWithdrawalHistory();
+            } catch (error) {
+                 console.error("Error submitting withdraw request:", error);
+                 showErrorMessage(withdrawMessage, "Could not submit request. Please refresh and try again.");
+                 await fetchUserData(currentUserId); updateWithdrawUI(); // Refresh data on error
+            } finally {
+                 showLoadingButton(submitButton, false);
+            }
+        }
+
+        // --- Profile Logic (handleProfilePicUpload, handlePasswordResetRequestFromProfile, handlePasswordResetRequestFromInput) (অপরিবর্তিত) ---
+        async function handleProfilePicUpload(event) {
+             const file = event.target.files[0];
+             const uploadStatus = document.getElementById('uploadStatus');
+             hideMessage(uploadStatus);
+             if (!file || !currentUserId) return;
+             if (!file.type.startsWith('image/')) { showErrorMessage(uploadStatus, "Please select an image file."); return; }
+             const maxSizeMB = 2;
+             if (file.size > maxSizeMB * 1024 * 1024) { showErrorMessage(uploadStatus, `File size must be less than ${maxSizeMB}MB.`); return; }
+             showProgressMessage(uploadStatus, "Uploading...");
+             const uploadButton = event.target.closest('.upload-btn-wrapper').querySelector('.upload-btn');
+              if(uploadButton) uploadButton.disabled = true;
+             try {
+                await window.firebaseReady;
+                 const { ref as storageRef, uploadBytes, getDownloadURL } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+                 const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+                 const fileExtension = file.name.split('.').pop();
+                 const filePath = `profile_pictures/${currentUserId}.${fileExtension}?t=${Date.now()}`;
+                 const picRef = storageRef(fbStorage, filePath);
+                 const snapshot = await uploadBytes(picRef, file);
+                 const downloadURL = await getDownloadURL(snapshot.ref);
+                 await update(ref(fbDb, `users/${currentUserId}`), { profilePicUrl: downloadURL });
+                 currentUserData.profilePicUrl = downloadURL;
+                 updateProfilePic('profilePagePic', downloadURL, currentUserData.fullName);
+                 updateProfilePic('dashboardProfilePic', downloadURL, currentUserData.fullName);
+                 showSuccessMessage(uploadStatus, "Profile picture updated successfully!");
+                 setTimeout(() => hideMessage(uploadStatus), 3000);
+             } catch (error) {
+                  console.error("Profile picture upload error:", error);
+                  showErrorMessage(uploadStatus, "Failed to upload picture.");
+             } finally {
+                  if(uploadButton) uploadButton.disabled = false;
+                   event.target.value = null;
+             }
+         }
+        async function handlePasswordResetRequestFromProfile() {
+             hideMessage(profileMessage);
+             if (!currentUserData || !currentUserData.email) { showErrorMessage(profileMessage, "Could not find user email."); return; }
+             const email = currentUserData.email;
+              if (!confirm(`Send password reset instructions to ${email}?`)) return;
+              try {
+                await window.firebaseReady;
+                  const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                  await sendPasswordResetEmail(fbAuth, email);
+                  showSuccessMessage(profileMessage, `Password reset instructions sent to ${email}.`);
+              } catch (error) {
+                  console.error("Password reset error:", error);
+                  showErrorMessage(profileMessage, getFirebaseErrorMessage(error));
+              }
+         }
+        async function handlePasswordResetRequestFromInput(event) {
+             event.preventDefault();
+             const email = document.getElementById('resetEmail').value.trim();
+             hideMessage(resetErrorEl); hideMessage(resetSuccessEl);
+             const submitButton = event.submitter; showLoadingButton(submitButton, true, 'Sending...');
+             if (!email) { showErrorMessage(resetErrorEl, "Please enter email."); showLoadingButton(submitButton, false); return; }
+             try {
+                await window.firebaseReady;
+                  const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                  await sendPasswordResetEmail(fbAuth, email);
+                  showSuccessMessage(resetSuccessEl, `Password reset instructions sent to ${email}.`);
+                  document.getElementById('resetForm').reset();
+             } catch (error) {
+                 console.error("Password reset error:", error);
+                 showErrorMessage(resetErrorEl, getFirebaseErrorMessage(error));
+             } finally { showLoadingButton(submitButton, false); }
+         }
+
+        // --- Utility Functions (showErrorMessage, showSuccessPopupMessage, showProgressMessage, hideMessage, showLoadingButton, getFirebaseErrorMessage, escapeHtml) ---
+         function showErrorMessage(element, message) {
+            if(!element) return;
+            element.textContent = message;
+            element.className = 'error-message'; // Use specific class
+            element.classList.remove('hidden');
+         }
+        function showSuccessPopupMessage(element, message) {
+            if(!element) return;
+            element.textContent = message;
+            element.className = 'success-popup'; // Use specific class
+            element.classList.remove('hidden');
+         }
+        function showSuccessMessage(element, message) { // General success message
+            if(!element) return;
+            element.textContent = message;
+            element.className = 'message success';
+            element.classList.remove('hidden');
+         }
+        function showProgressMessage(element, message) {
+            if(!element) return;
+            element.textContent = message;
+            element.className = 'message info'; // Use info class
+            element.classList.remove('hidden');
+         }
+        function hideMessage(element) {
+            if (element) { element.classList.add('hidden'); element.textContent = ''; }
+        }
+        function showLoadingButton(button, isLoading, loadingText = 'Loading...') {
+             if(!button) return;
+             if (isLoading) {
+                 button.disabled = true;
+                  if (!button.dataset.originalText) { button.dataset.originalText = button.textContent; }
+                 button.textContent = loadingText;
+             } else {
+                 button.disabled = false;
+                  if (button.dataset.originalText) { button.textContent = button.dataset.originalText; delete button.dataset.originalText; }
+             }
+         }
+        function getFirebaseErrorMessage(error) {
+            let message = error.message || 'An unknown error occurred.';
+            if (error.code) {
+                switch (error.code) {
+                    case 'auth/invalid-email': message = 'Invalid email address format.'; break;
+                    case 'auth/user-not-found': message = 'No account found with this email/username.'; break;
+                    case 'auth/wrong-password': message = 'Incorrect password.'; break;
+                    case 'auth/email-already-in-use': message = 'This email address is already registered.'; break;
+                    case 'auth/weak-password': message = 'Password is too weak (min 6 characters).'; break;
+                    case 'auth/network-request-failed': message = 'Network error. Check connection.'; break;
+                    case 'auth/too-many-requests': message = 'Too many attempts. Try again later.'; break;
+                    case 'auth/user-disabled': message = 'This account has been disabled.'; break;
+                }
+            }
+            return message;
+        }
+        function escapeHtml(unsafe) {
+             if (typeof unsafe !== 'string') { return unsafe !== null && unsafe !== undefined ? String(unsafe) : ''; }
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return unsafe.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // --- Initialization ---
+        async function initializeApp() {
+            console.log("Initializing User App...");
+            try {
+                // Wait for Firebase services to be ready
+                const services = await window.firebaseReady;
+                fbAuth = services.auth;
+                fbDb = services.db;
+                fbStorage = services.storage;
+                console.log("Firebase services assigned.");
+
+                const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+
+                // Setup Auth state listener AFTER services are ready
+                onAuthStateChanged(fbAuth, async (user) => {
+                    const activePageId = document.querySelector('.page:not(.hidden)')?.id; // Find visible page
+                    console.log(`Auth state changed. User: ${user ? user.uid : 'null'}. Active page: ${activePageId}`); // Debug
+
+                    if (user) {
+                        // User is signed in
+                        currentUserId = user.uid;
+                        const dataFetched = await fetchUserData(user.uid); // Fetch/refresh data
+                        if (dataFetched) {
+                            updateUIForLoggedInUser(); // Update UI elements
+                            // Navigate to dashboard ONLY if currently on an auth page
+                            if (['loginPage', 'signupPage', 'forgotPasswordPage'].includes(activePageId)) {
+                                navigateTo('dashboardPage');
+                            } else if (!activePageId || activePageId === "") {
+                                // If no page is active (initial load scenario after sign in)
+                                navigateTo('dashboardPage');
+                            }
+                        } // fetchUserData handles logout if fetch fails
+                    } else {
+                        // User is signed out
+                        currentUserId = null;
+                        currentUserData = null;
+                        clearUserDataFromUI(); // Reset UI elements
+                        // Navigate to login ONLY if not already on an auth page
+                        if (!['loginPage', 'signupPage', 'forgotPasswordPage'].includes(activePageId)) {
+                            navigateTo('loginPage');
+                        }
+                    }
+                });
+
+            } catch (error) {
+                  console.error("Critical Error during app initialization:", error);
+                  document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: red;">Application initialization failed. Please check the console and refresh.</div>';
+            }
+
+             // Add menu toggle listener
+             menuToggleBtn.addEventListener('click', toggleMenu);
+        }
+
+        // Run initialization when the DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+
+</body>
+</html>
